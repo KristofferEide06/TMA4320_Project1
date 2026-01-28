@@ -88,17 +88,26 @@ def forward(
     def sigma(z):
         return jnp.tanh(z)
     
-    a = jnp.stack([x, y, t], axis = -1)
+    x_norm = (x- x -cfg.x_min)/(cfg.x_max - cfg.x_min)
+    y_norm = (y - cfg.y_min)/(cfg.y_max - cfg.y_min)
+    t_norm = (t - cfg.t_min)/(cfg.t_max - cfg.t_min)
     
-    for W, b in nn_params:
-        a = sigma(jnp.matmul(a, W) + b)
+    a_norm = jnp.stack([x_norm, y_norm, t_norm], axis = -1)
 
+    
+    
+    for W, b in nn_params[:-1]:
+        a_norm = sigma(jnp.matmul(a_norm, W) + b)
+
+    W_final, b_final = nn_params[-1]
+    
+    a_norm = jnp.matmul(a_norm , W_final) + b_final
     #######################################################################
     # Oppgave 4.1: Slutt
     #######################################################################
 
     
-    return jnp.squeeze(a)
+    return jnp.squeeze(a_norm)
 
 
 def predict_grid(

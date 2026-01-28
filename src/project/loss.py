@@ -37,11 +37,10 @@ def data_loss(
     
     data_loss_val = jnp.mean((T_estimate - T_true)**2)
 
-    
     #######################################################################
     # Oppgave 4.2: Slutt (se også ic_loss)
     #######################################################################
-
+    
     return data_loss_val
 
 
