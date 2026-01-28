@@ -85,13 +85,20 @@ def forward(
     #######################################################################
 
     # Placeholder initialization — replace this with your implementation
-    out = None
+    def sigma(z):
+        return jnp.tanh(z)
+    
+    a = jnp.stack([x, y, t], axis = -1)
+    
+    for W, b in nn_params:
+        a = sigma(jnp.matmul(a, W) + b)
 
     #######################################################################
     # Oppgave 4.1: Slutt
     #######################################################################
 
-    return out
+    
+    return jnp.squeeze(a)
 
 
 def predict_grid(
