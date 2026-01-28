@@ -88,7 +88,7 @@ def forward(
     def sigma(z):
         return jnp.tanh(z)
     
-    x_norm = (x- x -cfg.x_min)/(cfg.x_max - cfg.x_min)
+    x_norm = (x -cfg.x_min)/(cfg.x_max - cfg.x_min)
     y_norm = (y - cfg.y_min)/(cfg.y_max - cfg.y_min)
     t_norm = (t - cfg.t_min)/(cfg.t_max - cfg.t_min)
     
