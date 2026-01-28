@@ -34,9 +34,42 @@ def train_nn(
     #######################################################################
     # Oppgave 4.3: Start
     #######################################################################
-
+    
     # Update the nn_params and losses dictionary
 
+    num_epochs = cfg.num_epochs
+    adam_state = init_adam(nn_params)
+    
+    from tqdm import tqdm
+    
+    def objective_funcftion(nn_params):
+        loss_data = data_loss(nn_params, sensor_data, cfg)
+        loss_ic = ic_loss(nn_params, ic_epoch, cfg)
+        return cfg.lambda_data*loss_data + cfg.lambda_ic*loss_ic, (loss_data, loss_ic)
+        
+    
+    for _ in tqdm(range(num_epochs), desc = "Training NN"):
+        ic_epoch, key = sample_ic(key, cfg)
+        
+        
+        (error_total, aux), grad_total =  jax.value_and_grad(objective_funcftion, has_aux = True)(nn_params)
+        
+  
+        
+        losses["total"].append(error_total)
+        error_data, error_icl = aux
+        losses["data"].append(error_data)
+        losses["ic"].append(error_icl)
+        
+        nn_params, adam_state = adam_step(nn_params, grad_total, adam_state, lr = cfg.learning_rate)
+
+        
+    #for each epoch: 
+        #Sample positions for ic_loss
+        #Find cost function values and gradients
+        #Use adam algorithm to update parameters
+        #Save losses in dictionary
+    
     #######################################################################
     # Oppgave 4.3: Slutt
     #######################################################################
