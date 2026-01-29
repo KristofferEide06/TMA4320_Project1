@@ -52,10 +52,10 @@ def init_pinn_params(cfg: Config, seed: int | None = None):
     alpha, k, h, P = jnp.array([0.25]), jnp.array([0.04]), jnp.array([2]), jnp.array([30]) #Reasonable if high insulation, check divide by zero for h = 0 error!
     
     pinn_params['nn'] = nn_params
-    pinn_params['log_alpha'] = np.log(alpha)
-    pinn_params['log_k'] = np.log(k)
-    pinn_params['log_h'] = np.log(h)
-    pinn_params['log_power'] = np.log(P)
+    pinn_params['log_alpha'] = jnp.log(alpha)
+    pinn_params['log_k'] = jnp.log(k)
+    pinn_params['log_h'] = jnp.log(h)
+    pinn_params['log_power'] = jnp.log(P)
     
     #######################################################################
     # Oppgave 5.1: Slutt
