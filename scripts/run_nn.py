@@ -21,6 +21,46 @@ def main():
     # Oppgave 4.4: Start
     #######################################################################
 
+    x, y, t, T_fdm, sensor_data = generate_training_data(cfg) 
+    nn_params, losses = train_nn(sensor_data, cfg)
+    
+    T_pred = predict_grid(nn_params, x, y, t, cfg) 
+    
+    print("\nGenerating NN visualizations...")
+    plot_snapshots(
+        x,
+        y,
+        t,
+        T_pred,
+        save_path="output/NN/NN_snapshots.png",
+    )
+    create_animation(
+        x, y, t, T_pred, title="NN", save_path="output/NN/NN_animation.gif"
+    )
+    
+    loss_total, loss_data, loss_ic = losses["total"], losses["data"], losses["ic"]
+    epochs = cfg.num_epochs
+    epochs_data = np.linspace(0, epochs - 1, epochs)
+    
+    print(len(epochs_data))
+    print(len(loss_total))
+    print(len(loss_data))
+    print(len(loss_ic))
+    
+    plt.plot(epochs_data, loss_total, label = "L_total")
+    plt.plot(epochs_data, loss_data, label = "L_data")
+    plt.plot(epochs_data, loss_ic, label = "L_ic" )
+    
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss function value")
+    plt.title("Object functions plotted by epoch number")
+    
+    plt.grid()
+    plt.legend()
+    plt.savefig("output/NN/NN_animation.pdf")
+    
+    
+    
     #######################################################################
     # Oppgave 4.4: Slutt
     #######################################################################
