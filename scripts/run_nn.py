@@ -42,19 +42,14 @@ def main():
     epochs = cfg.num_epochs
     epochs_data = np.linspace(0, epochs - 1, epochs)
     
-    print(len(epochs_data))
-    print(len(loss_total))
-    print(len(loss_data))
-    print(len(loss_ic))
-    
     plt.plot(epochs_data, loss_total, label = "L_total")
     plt.plot(epochs_data, loss_data, label = "L_data")
     plt.plot(epochs_data, loss_ic, label = "L_ic" )
     plt.yscale('log')
     
     plt.xlabel("Epoch")
-    plt.ylabel("Loss function value")
-    plt.title("Object functions plotted by epoch number")
+    plt.ylabel("Log - Loss function value")
+    plt.title("Logplot of loss functions")
     
     plt.grid()
     plt.legend()

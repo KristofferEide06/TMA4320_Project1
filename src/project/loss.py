@@ -64,8 +64,6 @@ def ic_loss(
     #######################################################################
     # Oppgave 4.2: Start
     #######################################################################
-
-    # Placeholder initialization — replace this with your implementation
     T_true = cfg.T_outside    
     T_estimate = forward(nn_params, x, y, 0, cfg)
     
@@ -95,8 +93,6 @@ def physics_loss(pinn_params, interior_points, cfg: Config):
     #######################################################################
     # Oppgave 5.2: Start
     #######################################################################
-
-    # Placeholder initialization — replace this with your implementation
     def _physics_residual_scalar(pinn_params, x, y, t, cfg):
         def T_fn(x, y, t):
             return forward(pinn_params['nn'], x, y, t, cfg)
@@ -110,12 +106,8 @@ def physics_loss(pinn_params, interior_points, cfg: Config):
         f_laplace = f_xx + f_yy
         
         q = jnp.where(cfg.is_source(x, y), P, 0.0)
-        # q = P * cfg.is_source(x, y).astype(int)
         
         residual = f_t  - alpha*f_laplace -  q
-        
-        # print("log_alpha shape:", jnp.shape(pinn_params["log_alpha"]))
-        # print("forward shape:", jnp.shape(forward(pinn_params["nn"], x, y, t, cfg)))
         
         return residual
     
@@ -125,8 +117,6 @@ def physics_loss(pinn_params, interior_points, cfg: Config):
         )
     )(x, y, t)
     
-    #print(residuals.shape)
-
     physics_loss_val = jnp.mean(residuals**2)
 
     #######################################################################
