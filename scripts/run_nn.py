@@ -50,6 +50,7 @@ def main():
     plt.plot(epochs_data, loss_total, label = "L_total")
     plt.plot(epochs_data, loss_data, label = "L_data")
     plt.plot(epochs_data, loss_ic, label = "L_ic" )
+    plt.yscale('log')
     
     plt.xlabel("Epoch")
     plt.ylabel("Loss function value")
@@ -57,7 +58,7 @@ def main():
     
     plt.grid()
     plt.legend()
-    plt.savefig("output/NN/NN_animation.pdf")
+    plt.savefig("output/NN/NNloss.pdf")
     
     
     

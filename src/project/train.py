@@ -103,34 +103,43 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
     
     from tqdm import tqdm
     
-    def objective_function(pinn_params):
-        nn_params = pinn_params['nn']
-        loss_data = data_loss(nn_params, sensor_data, cfg)
-        loss_ic = ic_loss(nn_params, ic_epoch, cfg)
-        loss_bc = bc_loss(pinn_params, bc_epoch, cfg)
-        loss_ph = physics_loss(pinn_params, interior_epoch, cfg)
+    @jax.jit
+    def step(key, pinn_params, opt_state, interior_epoch, bc_epoch, ic_epoch):
+        def objective_function(pinn_params):
+            nn_params = pinn_params['nn']
+            loss_data = data_loss(nn_params, sensor_data, cfg)
+            loss_ic = ic_loss(nn_params, ic_epoch, cfg)
+            loss_bc = bc_loss(pinn_params, bc_epoch, cfg)
+            loss_ph = physics_loss(pinn_params, interior_epoch, cfg)
+            
+            return cfg.lambda_data*loss_data + cfg.lambda_ic*loss_ic + cfg.lambda_bc*loss_bc + cfg.lambda_physics*loss_ph, (loss_data, loss_ic, loss_bc, loss_ph)
         
-        return cfg.lambda_data*loss_data + cfg.lambda_ic*loss_ic + cfg.lambda_bc*loss_bc + cfg.lambda_physics*loss_ph, (loss_data, loss_ic, loss_bc, loss_ph)
+        
+        
+        
+        (error_total, aux), grad_total =  jax.value_and_grad(objective_function, has_aux = True)(pinn_params)
+        
+        
+       
+        error_data, error_icl, error_bc, error_ph = aux
+        
+        
+        pinn_params, opt_state = adam_step(pinn_params, grad_total, opt_state, lr = cfg.learning_rate)
+        
+        return pinn_params, opt_state, losses, error_total, error_data, error_icl, error_bc, error_ph
         
     
     for _ in tqdm(range(num_epochs), desc = "Training PINN"):
         interior_epoch, key = sample_interior(key, cfg)
         ic_epoch, key = sample_ic(key, cfg)
         bc_epoch, key = sample_bc(key, cfg)
-        
-        
-        (error_total, aux), grad_total =  jax.value_and_grad(objective_function, has_aux = True)(pinn_params)
-        
+        pinn_params, opt_state, losses, error_total, error_data, error_icl, error_bc, error_ph = step(key, pinn_params, opt_state, interior_epoch, ic_epoch, bc_epoch)
         
         losses["total"].append(error_total)
-        error_data, error_icl, error_bc, error_ph = aux
         losses["data"].append(error_data)
         losses["ic"].append(error_icl)
         losses["bc"].append(error_bc)
         losses["physics"].append(error_ph)
-        
-        
-        pinn_params, opt_state = adam_step(pinn_params, grad_total, opt_state, lr = cfg.learning_rate)
 
 
     #######################################################################
