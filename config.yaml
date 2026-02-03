@@ -18,12 +18,13 @@ physics:
   k: 0.04               # Thermal conductivity
   h: 0.00               # Heat transfer coefficient (0 = perfectly insulated walls)
   T_outside: 0.0        # Outside temperature (constant)
+  T_max: 15.0
 
 # Heat source configuration
 source:
   locations:
     - [5.0, 2.5]        # Heat source position (x, y)
-    # - [1.0, 1.0]        # Additional heat source position
+    #- [1.0, 1.0]        # Additional heat source position
   sizes:
     - 0.5                # Heat source size (meters)
     # - 0.3                # Additional heat source size

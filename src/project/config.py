@@ -24,6 +24,7 @@ class Config:
     k: float
     h: float
     T_outside: float
+    T_max : float
 
     # Source
     source_locations: jnp.ndarray
@@ -91,6 +92,7 @@ def load_config(path: str | Path = "config.yaml") -> Config:
         k=data["physics"]["k"],
         h=data["physics"]["h"],
         T_outside=data["physics"]["T_outside"],
+        T_max = data["physics"]["T_max"],
         # Source
         source_locations=jnp.asarray(
             data["source"]["locations"],

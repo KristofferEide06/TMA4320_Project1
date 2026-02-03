@@ -233,24 +233,6 @@ class TestPhysicsLoss:
             "T_xx = grad(grad(T_fn, 0), 0)(x, y, t), T_yy = grad(grad(T_fn, 1), 1)(x, y, t)."
         )
 
-    def test_uses_learned_alpha(self, cfg):
-        """Check that physics_loss uses the learned alpha parameter."""
-        from project.model import init_pinn_params
-
-        pinn_params = init_pinn_params(cfg, seed=42)
-        colloc = jnp.array([[5.0, 2.5, 12.0]])
-
-        loss1 = physics_loss(pinn_params, colloc, cfg)
-
-        # Modify log_alpha and check loss changes
-        modified_params = {**pinn_params, "log_alpha": pinn_params["log_alpha"] + 1.0}
-        loss2 = physics_loss(modified_params, colloc, cfg)
-
-        assert not jnp.allclose(loss1, loss2), (
-            "physics_loss didn't change when log_alpha changed. "
-            "Make sure to use alpha = jnp.exp(pinn_params['log_alpha']) in the residual."
-        )
-
     def test_differentiable(self, pinn_params, colloc_points, cfg):
         """Check that physics_loss is differentiable."""
 

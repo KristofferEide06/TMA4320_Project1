@@ -6,6 +6,9 @@ from project import (
     load_config,
     solve_heat_equation,
 )
+from project.smart_fdm import solve_heat_equation as solve_heat_equation_smart
+
+
 
 
 def main():
