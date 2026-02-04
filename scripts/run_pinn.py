@@ -26,6 +26,7 @@ def main():
     
     T_pred = predict_grid(pinn_params['nn'], x, y, t, cfg) 
     
+    #Temp grid plot
     print("\nGenerating PINN visualizations...")
     plot_snapshots(
         x,
@@ -38,6 +39,7 @@ def main():
         x, y, t, T_pred, title="PINN", save_path="output/PINN/PINN_animation.gif"
     )
     
+    #Plot of loss functions
     loss_total, loss_data, loss_ic, loss_bc, loss_ph = losses['total'], losses['data'], losses['ic'], losses['bc'], losses['physics']
     epochs = cfg.num_epochs
     epochs_data = np.linspace(0, epochs - 1, epochs)

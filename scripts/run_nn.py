@@ -26,6 +26,7 @@ def main():
     
     T_pred = predict_grid(nn_params, x, y, t, cfg) 
     
+    #Temp grid plot 
     print("\nGenerating NN visualizations...")
     plot_snapshots(
         x,
@@ -38,6 +39,7 @@ def main():
         x, y, t, T_pred, title="NN", save_path="output/NN/NN_animation.gif"
     )
     
+    #Plot of loss functions
     loss_total, loss_data, loss_ic = losses["total"], losses["data"], losses["ic"]
     epochs = cfg.num_epochs
     epochs_data = np.linspace(0, epochs - 1, epochs)

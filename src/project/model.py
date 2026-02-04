@@ -43,14 +43,13 @@ def init_pinn_params(cfg: Config, seed: int | None = None):
     #######################################################################
     # Oppgave 5.1: Start
     #######################################################################
-
-    # Placeholder initialization — replace this with your implementation
     pinn_params = {}
     
-    nn_params = init_nn_params(cfg, key)
-    
+    #Initialize params
+    nn_params = init_nn_params(cfg, nn_key)
     alpha, k, h, P = jnp.array([0.25]), jnp.array([0.04]), jnp.array([2]), jnp.array([30]) #Reasonable if high insulation
     
+    #Fill pinn_params dict
     pinn_params['nn'] = nn_params
     pinn_params['log_alpha'] = jnp.log(alpha)
     pinn_params['log_k'] = jnp.log(k)
@@ -93,21 +92,27 @@ def forward(
     #######################################################################
     # Oppgave 4.1: Start
     #######################################################################
-    def sigma(z):
+    def sigma(z : jnp.ndarray):
+        """Activation function.
+        Args: 
+            z: Linearly transformed input layer - a@W + b
+        Returns:
+            Transformed output (jnp.ndarray) with regards to the choice of activation function
+            """
         return jnp.tanh(z)
     
+    #Normalize inputs and stack
     x_norm = (x -cfg.x_min)/(cfg.x_max - cfg.x_min)
     y_norm = (y - cfg.y_min)/(cfg.y_max - cfg.y_min)
     t_norm = (t - cfg.t_min)/(cfg.t_max - cfg.t_min)
-    
     a = jnp.stack([x_norm, y_norm, t_norm], axis = -1)
 
-
+    #Forward propagate through hidden layers
     for W, b in nn_params[:-1]:
         a = sigma(jnp.matmul(a, W) + b)
 
-    W_final, b_final = nn_params[-1]
-    
+    #Avoid using activation function on final layer, only linearly transform
+    W_final, b_final = nn_params[-1] 
     a = jnp.matmul(a, W_final) + b_final
     
     #######################################################################

@@ -15,7 +15,7 @@ def main():
     cfg = load_config("config.yaml")
 
     print("Solving heat equation with FDM...")
-    x, y, t, T_fdm = solve_heat_equation(cfg)
+    x, y, t, T_fdm = solve_heat_equation_smart(cfg)
 
     print("\nGenerating FDM visualizations...")
     plot_snapshots(

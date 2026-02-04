@@ -43,9 +43,22 @@ def train_nn(
     adam_state = init_adam(nn_params)
     
     @jax.jit
-    def step(nn_params, adam_state):
-        def objective_function(nn_params):
+    def step(nn_params : list[tuple[jnp.ndarray, jnp.ndarray]], adam_state : dict):
+        """Step-function, calculates necessary parameters for step algorithm 
+        
+        Args:
+            nn_params : Network parameters (list of (W, b) tuples)
+            adam_state : Optimizer state dict with moment estimates and step count
             
+        Returns:
+            nn_params: Corrected network parameters
+            adam_state: Updated adam_state dict
+            error_total: MSE for the object function
+            aux: Tuple containg MSE for the loss functions (loss_data, loss_ic)
+        """
+            
+        def objective_function(nn_params : list[tuple[jnp.ndarray, jnp.ndarray]]):
+            """Calcualtes the MSE for the objective_function"""
             loss_data = data_loss(nn_params, sensor_data, cfg)
             loss_ic = ic_loss(nn_params, ic_epoch, cfg)
             
@@ -56,16 +69,16 @@ def train_nn(
         
         return nn_params, adam_state, error_total, aux
     
-    
+    #Step algorithm: applies the step function to each epoch to calculates the new nn_params
     for _ in tqdm(range(num_epochs), desc = "Training NN"):
         ic_epoch, key = sample_ic(key, cfg)
         
         nn_params, adam_state, error_total, aux = step(nn_params, adam_state) 
         
         error_data, error_icl = aux
-        losses["total"].append(error_total)
-        losses["data"].append(error_data)
-        losses["ic"].append(error_icl)
+        losses['total'].append(error_total)
+        losses['data'].append(error_data)
+        losses['ic'].append(error_icl)
         
     #######################################################################
     # Oppgave 4.3: Slutt
@@ -101,7 +114,20 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
     from tqdm import tqdm
     
     @jax.jit
-    def step(pinn_params, opt_state, interior_epoch, bc_epoch, ic_epoch):
+    def step(pinn_params : dict, opt_state : dict, interior_epoch : jnp.ndarray, bc_epoch : jnp.ndarray, ic_epoch : jnp.ndarray):
+        """Step-function, calculates loss-gradient and takes step in minimizing direction
+        
+        Args:
+            pinn_params : Network parameters (list of (W, b) tuples and)
+            adam_state : Optimizer state dict with moment estimates and step count
+            epochs: positions to use for the loss functions
+            
+        Returns:
+            nn_params: Corrected network parameters
+            opt_state: Updated adam_state dict
+            error_total: MSE for the object function
+            aux: Tuple containg MSE for the loss functions (loss_data, loss_ic)
+        """
         
         def objective_function(pinn_params):
             nn_params = pinn_params['nn']
@@ -119,7 +145,7 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
         
         return pinn_params, opt_state, error_total, aux
         
-    
+    #Step algorithm - uses the step function to train the network and updates the PINN parameters
     for _ in tqdm(range(num_epochs), desc = "Training PINN"):
         interior_epoch, key = sample_interior(key, cfg)
         ic_epoch, key = sample_ic(key, cfg)
@@ -128,11 +154,11 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
         
         error_data, error_icl, error_bc, error_ph = aux
         
-        losses["total"].append(error_total)
-        losses["data"].append(error_data)
-        losses["ic"].append(error_icl)
-        losses["bc"].append(error_bc)
-        losses["physics"].append(error_ph)
+        losses['total'].append(error_total)
+        losses['data'].append(error_data)
+        losses['ic'].append(error_icl)
+        losses['bc'].append(error_bc)
+        losses['physics'].append(error_ph)
 
 
     #######################################################################

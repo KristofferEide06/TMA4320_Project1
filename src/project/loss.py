@@ -30,13 +30,9 @@ def data_loss(
     #######################################################################
     # Oppgave 4.2: Start
     #######################################################################
-
-    # Placeholder initialization — replace this with your implementation
-    
     T_estimate = forward(nn_params, x, y, t, cfg)
     
     data_loss_val = jnp.mean((T_estimate - T_true)**2)
-
     #######################################################################
     # Oppgave 4.2: Slutt (se også ic_loss)
     #######################################################################
@@ -69,7 +65,6 @@ def ic_loss(
     
     error = (T_estimate - T_true)**2
     ic_loss_val = jnp.mean(error)
-
     #######################################################################
     # Oppgave 4.2: Slutt (se også data_loss)
     #######################################################################
@@ -94,23 +89,33 @@ def physics_loss(pinn_params, interior_points, cfg: Config):
     # Oppgave 5.2: Start
     #######################################################################
     def _physics_residual_scalar(pinn_params, x, y, t, cfg):
-        def T_fn(x, y, t):
+        """Compute heat equation residual: dT/dt - alpha nabla(T) - q
+        Args:
+            pinn_params: Full pinn_params dict with 'nn', 'log_k', 'log_h' keys
+            x, y, t: Points to evaluate heat equation (scalars)
+            cfg: Configuration
+        Return:
+            PH residual (scalar)
+        """
+        def T_fn(x, y, t): 
             return forward(pinn_params['nn'], x, y, t, cfg)
         
+        #Heat equation condition params
         alpha = jnp.exp(pinn_params['log_alpha'])
         P = jnp.exp(pinn_params['log_power'])
+        q = jnp.where(cfg.is_source(x, y), P, 0.0)
         
+        #Cumpute spatial derivatives with automatic differentiation
         f_t = grad(T_fn, 2)(x, y, t)
         f_xx = grad(grad(T_fn, 0), 0)(x, y, t)
         f_yy = grad(grad(T_fn, 1), 1)(x, y ,t)
         f_laplace = f_xx + f_yy
         
-        q = jnp.where(cfg.is_source(x, y), P, 0.0)
-        
         residual = f_t  - alpha*f_laplace -  q
         
         return residual
     
+    #Vectorize residuals
     residuals = vmap(
         lambda xi, yi, ti: _physics_residual_scalar(
             pinn_params, xi, yi, ti, cfg
@@ -154,7 +159,7 @@ def bc_loss(pinn_params: dict, bc_points, cfg: Config) -> jnp.ndarray:
         """
 
         def T_fn(x, y, t):
-            return forward(pinn_params["nn"], x, y, t, cfg)
+            return forward(pinn_params['nn'], x, y, t, cfg)
 
         # Compute spatial gradients using automatic differentiation
         T_x = grad(T_fn, 0)(x, y, t)
@@ -165,12 +170,11 @@ def bc_loss(pinn_params: dict, bc_points, cfg: Config) -> jnp.ndarray:
 
         # Robin BC: -k * (grad T . n) = h * (T - T_out)
         grad_T_dot_n = T_x * nx + T_y * ny
-        k = jnp.exp(pinn_params["log_k"])
-        h = jnp.exp(pinn_params["log_h"])
+        k = jnp.exp(pinn_params['log_k'])
+        h = jnp.exp(pinn_params['log_h'])
         residual = -k * grad_T_dot_n - h * (T - cfg.T_outside)
 
         return residual
-
     residuals = vmap(
         lambda xi, yi, ti, nxi, nyi: _bc_residual_scalar(
             pinn_params, xi, yi, ti, nxi, nyi, cfg
