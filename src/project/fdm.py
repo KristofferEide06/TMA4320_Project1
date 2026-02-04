@@ -32,11 +32,12 @@ def solve_heat_equation(
     #######################################################################
     # Oppgave 3.2: Start
     #######################################################################
+    #Initialize T arr and gauss matrix
     T = np.zeros((cfg.nt, cfg.nx, cfg.ny))
     T [0, :, :] = cfg.T_outside
-    
     A = _build_matrix(cfg, dx, dy, dt)
     
+    #Solve gauss equation for each timestep
     for k in range(cfg.nt-1):
         t_next = t[k+1]
         b = _build_rhs(cfg, T[k, :, :], X, Y, dx, dy, dt, t_next)
