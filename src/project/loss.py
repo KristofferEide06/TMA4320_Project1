@@ -88,7 +88,7 @@ def physics_loss(pinn_params, interior_points, cfg: Config):
     #######################################################################
     # Oppgave 5.2: Start
     #######################################################################
-    def _physics_residual_scalar(pinn_params, x, y, t, cfg):
+    def _physics_residual_scalar(pinn_params : dict, x : jnp.ndarray , y : jnp.ndarray, t : jnp.ndarray, cfg : Config):
         """Compute heat equation residual: dT/dt - alpha nabla(T) - q
         Args:
             pinn_params: Full pinn_params dict with 'nn', 'log_k', 'log_h' keys

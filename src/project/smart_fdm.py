@@ -44,6 +44,7 @@ def solve_heat_equation(
         b = _build_rhs(cfg, T[k, :, :], X, Y, dx, dy, dt, t_next, q_on)
         T[k+1, :, :] = np.linalg.solve(A, b).reshape(cfg.nx, cfg.ny)
         
+        #Find sensor temperatures
         sensor_indeces = cfg.sensor_locations
         sensor_temp = []
         
@@ -53,6 +54,7 @@ def solve_heat_equation(
             temp = T[k, i, j]
             sensor_temp.append(temp)
         
+        #Turn off heat sorce if temperature exceeds T_max
         max_sensor_temp = np.max(np.array(sensor_temp))
         T_max = cfg.T_max
         

@@ -59,6 +59,7 @@ def train_nn(
             
         def objective_function(nn_params : list[tuple[jnp.ndarray, jnp.ndarray]]):
             """Calcualtes the MSE for the objective_function"""
+            
             loss_data = data_loss(nn_params, sensor_data, cfg)
             loss_ic = ic_loss(nn_params, ic_epoch, cfg)
             
@@ -129,7 +130,9 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
             aux: Tuple containg MSE for the loss functions (loss_data, loss_ic)
         """
         
-        def objective_function(pinn_params):
+        def objective_function(pinn_params : dict):
+            """Calculates MSE for objective function"""
+            
             nn_params = pinn_params['nn']
             
             loss_data = data_loss(nn_params, sensor_data, cfg)
@@ -140,7 +143,6 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
             return cfg.lambda_data*loss_data + cfg.lambda_ic*loss_ic + cfg.lambda_bc*loss_bc + cfg.lambda_physics*loss_ph, (loss_data, loss_ic, loss_bc, loss_ph)
         
         (error_total, aux), grad_total =  jax.value_and_grad(objective_function, has_aux = True)(pinn_params)
-        
         pinn_params, opt_state = adam_step(pinn_params, grad_total, opt_state, lr = cfg.learning_rate)
         
         return pinn_params, opt_state, error_total, aux
