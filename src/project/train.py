@@ -127,7 +127,7 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
             nn_params: Corrected network parameters
             opt_state: Updated adam_state dict
             error_total: MSE for the object function
-            aux: Tuple containg MSE for the loss functions (loss_data, loss_ic)
+            aux: Tuple containg MSE for the loss functions (loss_data, loss_ic, loss_bc, loss_ph)
         """
         
         def objective_function(pinn_params : dict):
