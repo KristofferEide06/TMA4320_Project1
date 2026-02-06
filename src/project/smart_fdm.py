@@ -54,8 +54,8 @@ def solve_heat_equation(
             temp = T[k, i, j]
             sensor_temp.append(temp)
         
-        #Turn off heat sorce if temperature exceeds T_max
-        max_sensor_temp = np.max(np.array(sensor_temp))
+        #Turn off heat sorce if mean temperature exceeds T_max
+        max_sensor_temp = np.mean(np.array(sensor_temp))
         T_max = cfg.T_max
         
         if (max_sensor_temp < T_max):
