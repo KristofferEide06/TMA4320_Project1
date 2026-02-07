@@ -166,5 +166,13 @@ def train_pinn(sensor_data: jnp.ndarray, cfg: Config) -> tuple[dict, dict]:
     #######################################################################
     # Oppgave 5.3: Slutt
     #######################################################################
-
+    alpha = jnp.exp(pinn_params['alpha'])
+    P = jnp.exp(pinn_params['P'])
+    k = jnp.exp(pinn_params['log_k'])
+    h = jnp.exp(pinn_params['log_h'])
+    
+    print(f'Alpha: {alpha}')
+    print(f'Power : {P}')
+    print(f'(k : {k})')
+    print(f'h : {h}')
     return pinn_params, {k: jnp.array(v) for k, v in losses.items()}
