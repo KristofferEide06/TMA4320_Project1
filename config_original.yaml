@@ -1,4 +1,5 @@
 # Configuration for PINN Room Heating Simulation
+#original config, is used as reference when making changes in config.yaml
 
 # Spatial domain (meters)
 domain:
