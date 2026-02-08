@@ -3,9 +3,9 @@
 # Spatial domain (meters)
 domain:
   x_min: 0.0
-  x_max: 20.0
+  x_max: 10.0
   y_min: 0.0
-  y_max: 10.0
+  y_max: 5.0
 
 # Temporal domain (hours)
 time:
@@ -16,14 +16,14 @@ time:
 physics:
   alpha: 0.25           # Thermal diffusivity
   k: 0.04               # Thermal conductivity
-  h: 1.1               # Heat transfer coefficient (0 = perfectly insulated walls)
+  h: 0                  # Heat transfer coefficient (0 = perfectly insulated walls)
   T_outside: 0.0        # Outside temperature (constant)
   T_max: 10.0           #Desired temperature for smart_fdm
 
 # Heat source configuration
 source:
   locations:
-    - [10.0, 5.0]        # Heat source position (x, y)
+    - [5.0, 2.5]        # Heat source position (x, y)
     #- [1.0, 1.0]        # Additional heat source position
   sizes:
     - 0.5                # Heat source size (meters)
