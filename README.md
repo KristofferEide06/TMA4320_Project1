@@ -13,7 +13,7 @@ Spring 2026
 First install uv via https://docs.astral.sh/uv/getting-started/installation/.
 Then generate environment with
 ```bash
-    uv sync
+uv sync
 ```
 
 #### Run scripts
