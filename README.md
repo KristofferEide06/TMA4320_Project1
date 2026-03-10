@@ -33,7 +33,7 @@ python scripts/<path>
 
 Our main code is in
 - scripts/run_fdm.py
-- run_sensordata.py
+- scripts/run_sensordata.py
 - scripts/run_nn.py
 - scripts/run_pinn.py
 
